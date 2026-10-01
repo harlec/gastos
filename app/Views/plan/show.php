@@ -50,33 +50,48 @@ $mesesEs = [
     </div>
   </div>
 
-  <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 mb-4" id="cards"></div>
+  <div class="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-2 mb-4" id="cards"></div>
 
   <p id="banner" class="rounded-2xl px-5 py-3.5 mb-5 text-sm sm:text-base font-semibold"></p>
 
   <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-4 mb-6">
     <div class="bg-neutral-50 rounded-2xl p-4">
-      <h2 class="text-base font-bold text-neutral-900 mb-2.5">Pagos fijos con fecha</h2>
+      <div class="flex items-start justify-between gap-2 mb-2.5">
+        <h2 class="text-base font-bold text-neutral-900">Pagos fijos con fecha</h2>
+        <span id="total-fijo" class="total-badge"></span>
+      </div>
       <div id="list-fijo" class="space-y-2"></div>
       <button type="button" class="addBtn no-print" data-cat="fijo">+ Agregar pago fijo</button>
     </div>
     <div class="bg-neutral-50 rounded-2xl p-4">
-      <h2 class="text-base font-bold text-neutral-900 mb-2.5">Compras o gastos del mes</h2>
+      <div class="flex items-start justify-between gap-2 mb-2.5">
+        <h2 class="text-base font-bold text-neutral-900">Compras o gastos del mes</h2>
+        <span id="total-compra" class="total-badge"></span>
+      </div>
       <div id="list-compra" class="space-y-2"></div>
       <button type="button" class="addBtn no-print" data-cat="compra">+ Agregar compra o gasto</button>
     </div>
     <div class="bg-neutral-50 rounded-2xl p-4">
-      <h2 class="text-base font-bold text-neutral-900 mb-2.5">Gastos semanales</h2>
+      <div class="flex items-start justify-between gap-2 mb-2.5">
+        <h2 class="text-base font-bold text-neutral-900">Gastos semanales</h2>
+        <span id="total-semanal" class="total-badge text-right"></span>
+      </div>
       <div id="list-semanal" class="space-y-2"></div>
       <button type="button" class="addBtn no-print" data-cat="semanal">+ Agregar gasto semanal</button>
     </div>
     <div class="bg-neutral-50 rounded-2xl p-4">
-      <h2 class="text-base font-bold text-neutral-900 mb-2.5">Gastos diarios</h2>
+      <div class="flex items-start justify-between gap-2 mb-2.5">
+        <h2 class="text-base font-bold text-neutral-900">Gastos diarios</h2>
+        <span id="total-diario" class="total-badge text-right"></span>
+      </div>
       <div id="list-diario" class="space-y-2"></div>
       <button type="button" class="addBtn no-print" data-cat="diario">+ Agregar gasto diario</button>
     </div>
     <div class="bg-neutral-50 rounded-2xl p-4">
-      <h2 class="text-base font-bold text-neutral-900 mb-2.5">Deudas y préstamos pendientes</h2>
+      <div class="flex items-start justify-between gap-2 mb-2.5">
+        <h2 class="text-base font-bold text-neutral-900">Deudas y préstamos pendientes</h2>
+        <span id="total-deuda" class="total-badge"></span>
+      </div>
       <div id="list-deuda" class="space-y-2"></div>
       <button type="button" class="addBtn no-print" data-cat="deuda">+ Agregar deuda o préstamo</button>
     </div>

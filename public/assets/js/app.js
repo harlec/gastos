@@ -205,6 +205,26 @@
     return CATS[key].items.reduce((s, it) => s + ((!essOnly || it.esNecesario) ? it.monto : 0), 0);
   }
 
+  function setTotalBadge(key, text) {
+    const el = document.getElementById('total-' + key);
+    if (el) el.textContent = text;
+  }
+
+  // Pagos fijos, compras y deudas ya son montos del mes tal cual.
+  // Semanales y diarios son recurrentes: se muestra lo que suman por
+  // semana y a cuánto equivalen en el mes completo (semanal/7*30, diario*30).
+  function updateCatTotals() {
+    setTotalBadge('fijo', 'Mes: ' + money(sumAmount('fijo')));
+    setTotalBadge('compra', 'Mes: ' + money(sumAmount('compra')));
+    setTotalBadge('deuda', 'Mes: ' + money(sumAmount('deuda')));
+
+    const semanalTotal = sumAmount('semanal');
+    setTotalBadge('semanal', 'Semana: ' + money(semanalTotal) + ' · Mes: ' + money(semanalTotal / 7 * 30));
+
+    const diarioTotal = sumAmount('diario');
+    setTotalBadge('diario', 'Semana: ' + money(diarioTotal * 7) + ' · Mes: ' + money(diarioTotal * 30));
+  }
+
   function makeCard(cls, label, value, sub) {
     const card = document.createElement('div');
     card.className = 'card ' + cls;
@@ -381,6 +401,7 @@
     }
 
     buildCards(totalIncomeAll, totalGastos, dailyAvail, weeklyAvail, essDiff, runOut, balances[30]);
+    updateCatTotals();
 
     const banner = document.getElementById('banner');
     if (essDiff < 0) {
