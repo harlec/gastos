@@ -8,7 +8,7 @@ $mesesEs = [
 
 function s($n) { return 'S/ ' . number_format((float) $n, 0, ',', '.'); }
 ?>
-<div class="max-w-5xl mx-auto bg-white rounded-3xl p-4 sm:p-7">
+<div class="w-full bg-white rounded-3xl p-4 sm:p-7">
 
   <div class="flex items-center justify-between gap-3 mb-6 flex-wrap">
     <h1 class="text-2xl sm:text-3xl font-extrabold text-neutral-900">Historial de meses</h1>

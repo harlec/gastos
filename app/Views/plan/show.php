@@ -9,7 +9,7 @@ $mesesEs = [
     7 => 'Julio', 8 => 'Agosto', 9 => 'Setiembre', 10 => 'Octubre', 11 => 'Noviembre', 12 => 'Diciembre',
 ];
 ?>
-<div id="sheet" class="max-w-6xl mx-auto bg-white rounded-3xl p-4 sm:p-7">
+<div id="sheet" class="w-full bg-white rounded-3xl p-4 sm:p-7">
 
   <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 mb-4">
     <div>
