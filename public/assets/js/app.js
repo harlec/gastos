@@ -246,33 +246,54 @@
 
     if (iconKey) {
       const iconWrap = document.createElement('div');
-      iconWrap.className = 'w-9 h-9 rounded-full bg-white/50 flex items-center justify-center mb-2';
+      iconWrap.className = 'w-10 h-10 shrink-0 rounded-full bg-white/50 flex items-center justify-center';
       iconWrap.innerHTML = svgIcon(iconKey, 'w-5 h-5');
       card.appendChild(iconWrap);
     }
 
+    const body = document.createElement('div');
+    body.className = 'card-body';
+
     const p1 = document.createElement('p');
     p1.className = 'label';
     p1.textContent = label;
-    card.appendChild(p1);
+    body.appendChild(p1);
 
     const p2 = document.createElement('p');
     p2.className = 'value';
     p2.textContent = value;
-    card.appendChild(p2);
+    body.appendChild(p2);
 
     if (sub) {
       const p3 = document.createElement('p');
       p3.className = 'sub2';
       p3.textContent = sub;
-      card.appendChild(p3);
+      body.appendChild(p3);
     }
 
+    card.appendChild(body);
     return card;
   }
 
   function buildCards(totalIncomeAll, totalGastos, dailyAvail, weeklyAvail, essDiff) {
     const wrap = document.getElementById('cards');
+
+    // recalc() llama a esta función en cada tecla que se presiona, y como
+    // reconstruye todo el HTML de las tarjetas, el input de "Otro ingreso"
+    // donde se está escribiendo se destruye y se vuelve a crear, perdiendo
+    // el foco. Guardamos qué campo estaba activo y el cursor para
+    // restaurarlo después de reconstruir.
+    const active = document.activeElement;
+    let focusInfo = null;
+    if (active && wrap.contains(active) && active.dataset.otroIndex !== undefined) {
+      focusInfo = {
+        index: active.dataset.otroIndex,
+        field: active.dataset.otroField,
+        start: active.selectionStart,
+        end: active.selectionEnd,
+      };
+    }
+
     wrap.innerHTML = '';
 
     wrap.appendChild(makeCard('card-income', 'Ingreso total', money(totalIncomeAll), 'Principal + otros ingresos', 'income'));
@@ -282,7 +303,7 @@
       card.className = 'card card-otro';
 
       const iconWrap = document.createElement('div');
-      iconWrap.className = 'w-9 h-9 rounded-full bg-white/50 flex items-center justify-center mb-2';
+      iconWrap.className = 'w-10 h-10 shrink-0 rounded-full bg-white/50 flex items-center justify-center';
       iconWrap.innerHTML = svgIcon('plus', 'w-5 h-5');
       card.appendChild(iconWrap);
 
@@ -293,37 +314,45 @@
       rm.addEventListener('click', () => removeOtro(i));
       card.appendChild(rm);
 
+      const body = document.createElement('div');
+      body.className = 'card-body';
+
       const label = document.createElement('p');
       label.className = 'label';
       label.textContent = 'Otro ingreso';
-      card.appendChild(label);
+      body.appendChild(label);
 
       const value = document.createElement('p');
       value.className = 'value';
       value.textContent = money(o.monto);
-      card.appendChild(value);
+      body.appendChild(value);
 
       const sub = document.createElement('p');
       sub.className = 'sub2';
-      sub.style.cssText = 'display:flex;gap:6px;margin-top:.5rem';
+      sub.style.cssText = 'display:flex;gap:6px;margin-top:.4rem';
 
       const nameInput = document.createElement('input');
       nameInput.type = 'text';
       nameInput.placeholder = 'Nombre';
       nameInput.value = o.nombre;
-      nameInput.style.cssText = 'width:110px;border:1px solid #cfe;border-radius:6px;padding:4px 7px;font-size:13px';
+      nameInput.dataset.otroIndex = String(i);
+      nameInput.dataset.otroField = 'nombre';
+      nameInput.style.cssText = 'width:90px;border:1px solid #cfe;border-radius:6px;padding:3px 6px;font-size:12px';
       nameInput.addEventListener('input', (e) => updateOtro(i, 'nombre', e.target.value));
 
       const amtInput = document.createElement('input');
       amtInput.type = 'number';
       amtInput.min = '0';
       amtInput.value = String(o.monto);
-      amtInput.style.cssText = 'width:85px;border:1px solid #cfe;border-radius:6px;padding:4px 7px;font-size:13px';
+      amtInput.dataset.otroIndex = String(i);
+      amtInput.dataset.otroField = 'monto';
+      amtInput.style.cssText = 'width:70px;border:1px solid #cfe;border-radius:6px;padding:3px 6px;font-size:12px';
       amtInput.addEventListener('input', (e) => updateOtro(i, 'monto', e.target.value));
 
       sub.appendChild(nameInput);
       sub.appendChild(amtInput);
-      card.appendChild(sub);
+      body.appendChild(sub);
+      card.appendChild(body);
 
       wrap.appendChild(card);
     });
@@ -335,6 +364,17 @@
     const estadoClass = essDiff < 0 ? 'card-estado-bad' : 'card-estado-ok';
     const estadoTxt = essDiff < 0 ? 'Necesitas prestar' : 'Te sobra tras lo necesario';
     wrap.appendChild(makeCard(estadoClass, estadoTxt, money(Math.abs(essDiff)), null, essDiff < 0 ? 'warning' : 'check'));
+
+    if (focusInfo) {
+      const selector = '[data-otro-index="' + focusInfo.index + '"][data-otro-field="' + focusInfo.field + '"]';
+      const el = wrap.querySelector(selector);
+      if (el) {
+        el.focus();
+        if (typeof focusInfo.start === 'number') {
+          try { el.setSelectionRange(focusInfo.start, focusInfo.end); } catch (e) { /* no soportado en inputs numéricos de algunos navegadores */ }
+        }
+      }
+    }
   }
 
   function renderDuracionAlert(runOut, balEnd) {

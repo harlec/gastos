@@ -50,7 +50,7 @@ $mesesEs = [
     </div>
   </div>
 
-  <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 mb-4" id="cards"></div>
+  <div class="flex gap-3 mb-4 overflow-x-auto pb-1" id="cards"></div>
 
   <div id="duracion-alert" class="alert-box"></div>
   <p id="banner" class="alert-box"></p>

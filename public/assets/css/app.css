@@ -4,18 +4,29 @@ body {
   font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
 }
 
-/* Tarjetas de resumen */
+/* Tarjetas de resumen: ícono a la izquierda, contenido a la derecha,
+   todas en una sola fila (el contenedor #cards hace scroll horizontal
+   si no entran todas). */
 .card {
-  border-radius: 1.2rem;
-  padding: 1.1rem 1.3rem;
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  flex: 1 1 170px;
+  min-width: 170px;
+  border-radius: 1.1rem;
+  padding: .85rem 1.1rem;
   position: relative;
 }
-.card .label { font-size: .85rem; opacity: .75; margin: 0 0 .4rem; font-weight: 600; line-height: 1.25; }
-.card .value { font-size: 2.1rem; font-weight: 800; margin: 0; line-height: 1.1; }
-.card .sub2 { font-size: .78rem; opacity: .7; margin: .3rem 0 0; }
+.card-body { min-width: 0; flex: 1; }
+.card .label {
+  font-size: .72rem; opacity: .75; margin: 0 0 .2rem; font-weight: 600; line-height: 1.2;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.card .value { font-size: 1.5rem; font-weight: 800; margin: 0; line-height: 1.1; white-space: nowrap; }
+.card .sub2 { font-size: .68rem; opacity: .7; margin: .2rem 0 0; }
 .card .rm {
-  position: absolute; top: .6rem; right: .75rem;
-  background: none; border: none; cursor: pointer; font-size: .85rem; color: #444;
+  position: absolute; top: .5rem; right: .65rem;
+  background: none; border: none; cursor: pointer; font-size: .8rem; color: #444;
 }
 
 /* Total por categoría, en la esquina superior derecha de cada lista */
@@ -79,7 +90,8 @@ body {
 dialog#new-plan-dialog::backdrop { background: rgba(0, 0, 0, .4); }
 
 @media (max-width: 640px) {
-  .card .value { font-size: 1.6rem; }
+  .card { flex: 1 1 150px; min-width: 150px; }
+  .card .value { font-size: 1.25rem; }
 }
 
 @media print {
