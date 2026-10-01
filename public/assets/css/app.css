@@ -6,16 +6,16 @@ body {
 
 /* Tarjetas de resumen */
 .card {
-  border-radius: .85rem;
-  padding: .55rem .65rem;
+  border-radius: 1.2rem;
+  padding: 1.1rem 1.3rem;
   position: relative;
 }
-.card .label { font-size: .66rem; opacity: .75; margin: 0 0 .25rem; font-weight: 600; line-height: 1.2; }
-.card .value { font-size: 1.05rem; font-weight: 800; margin: 0; line-height: 1.15; }
-.card .sub2 { font-size: .62rem; opacity: .7; margin: .2rem 0 0; }
+.card .label { font-size: .85rem; opacity: .75; margin: 0 0 .4rem; font-weight: 600; line-height: 1.25; }
+.card .value { font-size: 2.1rem; font-weight: 800; margin: 0; line-height: 1.1; }
+.card .sub2 { font-size: .78rem; opacity: .7; margin: .3rem 0 0; }
 .card .rm {
-  position: absolute; top: .3rem; right: .4rem;
-  background: none; border: none; cursor: pointer; font-size: .7rem; color: #444;
+  position: absolute; top: .6rem; right: .75rem;
+  background: none; border: none; cursor: pointer; font-size: .85rem; color: #444;
 }
 
 /* Total por categoría, en la esquina superior derecha de cada lista */
@@ -37,9 +37,18 @@ body {
 .card-semanal  { background: #b9c8f7; }
 .card-estado-ok  { background: #c8f0a0; }
 .card-estado-bad { background: #f7c1c1; }
-.card-duracion { background: #fbeaf0; }
 
-/* Banner de estado del mes */
+/* Aviso horizontal (duración del dinero / estado del mes) */
+.alert-box {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  border-radius: 1rem;
+  padding: .9rem 1.2rem;
+  margin-bottom: .75rem;
+  font-size: .9rem;
+  font-weight: 600;
+}
 .banner-ok  { background: #dff5cf; color: #2f5c17; }
 .banner-bad { background: #fbdada; color: #7a1f1f; }
 
@@ -70,7 +79,7 @@ body {
 dialog#new-plan-dialog::backdrop { background: rgba(0, 0, 0, .4); }
 
 @media (max-width: 640px) {
-  .card .value { font-size: .95rem; }
+  .card .value { font-size: 1.6rem; }
 }
 
 @media print {

@@ -205,6 +205,21 @@
     return CATS[key].items.reduce((s, it) => s + ((!essOnly || it.esNecesario) ? it.monto : 0), 0);
   }
 
+  const ICON_PATHS = {
+    income: '<path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>',
+    plus: '<path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>',
+    receipt: '<path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6Z"/>',
+    calendarDay: '<path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"/>',
+    calendarWeek: '<path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5M7.5 14.25h3m-3 3h7.5"/>',
+    check: '<path stroke-linecap="round" stroke-linejoin="round" d="m9 12.75 2.25 2.25 4.5-4.5m5.25 2.25a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>',
+    warning: '<path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"/>',
+    flag: '<path stroke-linecap="round" stroke-linejoin="round" d="M3 3v1.5M3 21v-6m0 0 2.77-.693a9 9 0 0 1 6.208.682l.108.054a9 9 0 0 0 6.086.71l3.114-.732a48.524 48.524 0 0 1-.005-10.499l-3.11.732a9 9 0 0 1-6.085-.711l-.108-.054a9 9 0 0 0-6.208-.682L3 4.5M3 15V4.5"/>',
+  };
+
+  function svgIcon(key, cls) {
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" class="' + (cls || '') + '">' + (ICON_PATHS[key] || '') + '</svg>';
+  }
+
   function setTotalBadge(key, text) {
     const el = document.getElementById('total-' + key);
     if (el) el.textContent = text;
@@ -225,9 +240,16 @@
     setTotalBadge('diario', 'Semana: ' + money(diarioTotal * 7) + ' · Mes: ' + money(diarioTotal * 30));
   }
 
-  function makeCard(cls, label, value, sub) {
+  function makeCard(cls, label, value, sub, iconKey) {
     const card = document.createElement('div');
     card.className = 'card ' + cls;
+
+    if (iconKey) {
+      const iconWrap = document.createElement('div');
+      iconWrap.className = 'w-9 h-9 rounded-full bg-white/50 flex items-center justify-center mb-2';
+      iconWrap.innerHTML = svgIcon(iconKey, 'w-5 h-5');
+      card.appendChild(iconWrap);
+    }
 
     const p1 = document.createElement('p');
     p1.className = 'label';
@@ -249,15 +271,20 @@
     return card;
   }
 
-  function buildCards(totalIncomeAll, totalGastos, dailyAvail, weeklyAvail, essDiff, runOut, balEnd) {
+  function buildCards(totalIncomeAll, totalGastos, dailyAvail, weeklyAvail, essDiff) {
     const wrap = document.getElementById('cards');
     wrap.innerHTML = '';
 
-    wrap.appendChild(makeCard('card-income', 'Ingreso total', money(totalIncomeAll), 'Principal + otros ingresos'));
+    wrap.appendChild(makeCard('card-income', 'Ingreso total', money(totalIncomeAll), 'Principal + otros ingresos', 'income'));
 
     otrosIngresos.forEach((o, i) => {
       const card = document.createElement('div');
       card.className = 'card card-otro';
+
+      const iconWrap = document.createElement('div');
+      iconWrap.className = 'w-9 h-9 rounded-full bg-white/50 flex items-center justify-center mb-2';
+      iconWrap.innerHTML = svgIcon('plus', 'w-5 h-5');
+      card.appendChild(iconWrap);
 
       const rm = document.createElement('button');
       rm.type = 'button';
@@ -278,20 +305,20 @@
 
       const sub = document.createElement('p');
       sub.className = 'sub2';
-      sub.style.cssText = 'display:flex;gap:4px';
+      sub.style.cssText = 'display:flex;gap:6px;margin-top:.5rem';
 
       const nameInput = document.createElement('input');
       nameInput.type = 'text';
       nameInput.placeholder = 'Nombre';
       nameInput.value = o.nombre;
-      nameInput.style.cssText = 'width:90px;border:1px solid #cfe;border-radius:6px;padding:2px 5px;font-size:12px';
+      nameInput.style.cssText = 'width:110px;border:1px solid #cfe;border-radius:6px;padding:4px 7px;font-size:13px';
       nameInput.addEventListener('input', (e) => updateOtro(i, 'nombre', e.target.value));
 
       const amtInput = document.createElement('input');
       amtInput.type = 'number';
       amtInput.min = '0';
       amtInput.value = String(o.monto);
-      amtInput.style.cssText = 'width:70px;border:1px solid #cfe;border-radius:6px;padding:2px 5px;font-size:12px';
+      amtInput.style.cssText = 'width:85px;border:1px solid #cfe;border-radius:6px;padding:4px 7px;font-size:13px';
       amtInput.addEventListener('input', (e) => updateOtro(i, 'monto', e.target.value));
 
       sub.appendChild(nameInput);
@@ -301,17 +328,28 @@
       wrap.appendChild(card);
     });
 
-    wrap.appendChild(makeCard('card-gastos', 'Gastos totales del mes', money(totalGastos)));
-    wrap.appendChild(makeCard('card-diario', 'Disponible por día', money(dailyAvail)));
-    wrap.appendChild(makeCard('card-semanal', 'Disponible por semana', money(weeklyAvail)));
+    wrap.appendChild(makeCard('card-gastos', 'Gastos totales del mes', money(totalGastos), null, 'receipt'));
+    wrap.appendChild(makeCard('card-diario', 'Disponible por día', money(dailyAvail), null, 'calendarDay'));
+    wrap.appendChild(makeCard('card-semanal', 'Disponible por semana', money(weeklyAvail), null, 'calendarWeek'));
 
     const estadoClass = essDiff < 0 ? 'card-estado-bad' : 'card-estado-ok';
     const estadoTxt = essDiff < 0 ? 'Necesitas prestar' : 'Te sobra tras lo necesario';
-    wrap.appendChild(makeCard(estadoClass, estadoTxt, money(Math.abs(essDiff))));
+    wrap.appendChild(makeCard(estadoClass, estadoTxt, money(Math.abs(essDiff)), null, essDiff < 0 ? 'warning' : 'check'));
+  }
 
-    const durTxt = runOut ? ('Alcanza hasta el día ' + runOut) : 'Alcanza todo el mes';
-    const durSub = runOut ? 'Después de ese día no queda dinero' : ('Con ' + money(balEnd) + ' de sobra');
-    wrap.appendChild(makeCard('card-duracion', 'Duración del dinero', durTxt, durSub));
+  function renderDuracionAlert(runOut, balEnd) {
+    const el = document.getElementById('duracion-alert');
+    if (!el) return;
+
+    if (runOut) {
+      el.className = 'alert-box banner-bad';
+      el.innerHTML = svgIcon('warning', 'w-6 h-6 shrink-0')
+        + '<span><strong>Alcanza hasta el día ' + runOut + '.</strong> Después de ese día no te queda dinero.</span>';
+    } else {
+      el.className = 'alert-box banner-ok';
+      el.innerHTML = svgIcon('flag', 'w-6 h-6 shrink-0')
+        + '<span><strong>Alcanza todo el mes.</strong> Te queda ' + money(balEnd) + ' de sobra el día 30.</span>';
+    }
   }
 
   function drawChart(totalIncomeAll, dailyAvail, balances, oneTimeDays) {
@@ -400,16 +438,19 @@
       if (runOut === null && bal <= 0) runOut = d;
     }
 
-    buildCards(totalIncomeAll, totalGastos, dailyAvail, weeklyAvail, essDiff, runOut, balances[30]);
+    buildCards(totalIncomeAll, totalGastos, dailyAvail, weeklyAvail, essDiff);
     updateCatTotals();
+    renderDuracionAlert(runOut, balances[30]);
 
     const banner = document.getElementById('banner');
     if (essDiff < 0) {
-      banner.className = 'rounded-2xl px-5 py-3.5 mb-5 text-sm sm:text-base font-semibold banner-bad';
-      banner.textContent = 'Con solo lo necesario ya te falta ' + money(Math.abs(essDiff)) + ' este mes. Esa es la cantidad que necesitarías prestar o conseguir de algún otro lado para cubrir lo esencial.';
+      banner.className = 'alert-box banner-bad';
+      banner.innerHTML = svgIcon('warning', 'w-6 h-6 shrink-0')
+        + '<span>Con solo lo necesario ya te falta ' + money(Math.abs(essDiff)) + ' este mes. Esa es la cantidad que necesitarías prestar o conseguir de algún otro lado para cubrir lo esencial.</span>';
     } else {
-      banner.className = 'rounded-2xl px-5 py-3.5 mb-5 text-sm sm:text-base font-semibold banner-ok';
-      banner.textContent = 'Cubriendo todo lo necesario, te quedan ' + money(essDiff) + ' libres en el mes para lo demás.';
+      banner.className = 'alert-box banner-ok';
+      banner.innerHTML = svgIcon('check', 'w-6 h-6 shrink-0')
+        + '<span>Cubriendo todo lo necesario, te quedan ' + money(essDiff) + ' libres en el mes para lo demás.</span>';
     }
 
     drawChart(totalIncomeAll, dailyAvail, balances, oneTimeDays);

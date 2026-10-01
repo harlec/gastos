@@ -50,9 +50,10 @@ $mesesEs = [
     </div>
   </div>
 
-  <div class="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-2 mb-4" id="cards"></div>
+  <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 mb-4" id="cards"></div>
 
-  <p id="banner" class="rounded-2xl px-5 py-3.5 mb-5 text-sm sm:text-base font-semibold"></p>
+  <div id="duracion-alert" class="alert-box"></div>
+  <p id="banner" class="alert-box"></p>
 
   <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-4 mb-6">
     <div class="bg-neutral-50 rounded-2xl p-4">
