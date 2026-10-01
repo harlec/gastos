@@ -1,0 +1,73 @@
+/* Estilos propios del plan mensual. El resto del layout usa utilidades de Tailwind. */
+
+body {
+  font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+/* Tarjetas de resumen */
+.card {
+  border-radius: 1rem;
+  padding: 0.875rem 1rem;
+  position: relative;
+}
+.card .label { font-size: 0.78rem; opacity: .75; margin: 0 0 .375rem; font-weight: 600; }
+.card .value { font-size: 1.55rem; font-weight: 800; margin: 0; line-height: 1.1; }
+.card .sub2 { font-size: .75rem; opacity: .7; margin: .25rem 0 0; }
+.card .rm {
+  position: absolute; top: .5rem; right: .6rem;
+  background: none; border: none; cursor: pointer; font-size: .8rem; color: #444;
+}
+
+.card-income   { background: #c8f0a0; }
+.card-otro     { background: #e1f5ee; }
+.card-gastos   { background: #f3f0fb; }
+.card-diario   { background: #ffd9a8; }
+.card-semanal  { background: #b9c8f7; }
+.card-estado-ok  { background: #c8f0a0; }
+.card-estado-bad { background: #f7c1c1; }
+.card-duracion { background: #fbeaf0; }
+
+/* Banner de estado del mes */
+.banner-ok  { background: #dff5cf; color: #2f5c17; }
+.banner-bad { background: #fbdada; color: #7a1f1f; }
+
+/* Filas de ítems (pagos fijos, compras, gastos, deudas) */
+.item-row {
+  display: flex; align-items: center; gap: .5rem; flex-wrap: wrap;
+  background: #fff; border: 1px solid #efefef; border-radius: .65rem; padding: .45rem .6rem;
+}
+.item-row input[type=text] { width: 120px; }
+.item-row input[type=number].day { width: 56px; }
+.item-row input[type=number].amt { width: 80px; }
+.item-row input {
+  border: 1px solid #e5e5e5; border-radius: .45rem; padding: .35rem .5rem; font-size: .875rem;
+}
+.item-row .lbl { font-size: .75rem; color: #888; }
+.item-row .ess { display: flex; align-items: center; gap: .25rem; font-size: .75rem; color: #666; }
+.item-row button.rmv {
+  margin-left: auto; background: none; border: none; color: #c94f4f;
+  font-size: .8rem; cursor: pointer; white-space: nowrap;
+}
+
+.addBtn {
+  background: #eee; border: none; border-radius: .65rem; padding: .5rem .9rem;
+  font-size: .8rem; cursor: pointer; font-weight: 600; margin-top: .5rem;
+}
+.addBtn:hover { background: #e2e2e2; }
+
+dialog#new-plan-dialog::backdrop { background: rgba(0, 0, 0, .4); }
+
+@media (max-width: 640px) {
+  .card .value { font-size: 1.3rem; }
+}
+
+@media print {
+  body { background: #fff !important; padding: 0 !important; }
+  #sheet { border-radius: 0 !important; }
+  .no-print,
+  .addBtn,
+  .item-row .rmv,
+  .card .rm {
+    display: none !important;
+  }
+}

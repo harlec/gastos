@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plan del mes</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<style>
+  * { box-sizing: border-box; font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; }
+  html, body { width: 100%; }
+  body { margin: 0; padding: 20px; background: #fbeaf0; font-size: 16px; }
+  #sheet { width: 100%; background: #ffffff; border-radius: 22px; padding: 24px 28px 30px; }
+
+  .top { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; margin-bottom: 16px; }
+  h1 { font-size: 30px; margin: 0; color: #1a1a1a; }
+  .sub { color: #8a8a8a; margin: 4px 0 0; font-size: 15px; }
+  .income-box { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .income-box label { font-size: 14px; color: #555; }
+  #income-principal { font-size: 22px; font-weight: 700; border: 1.5px solid #eee; border-radius: 10px; padding: 8px 12px; width: 140px; }
+  #exportBtn { background: #1a1a1a; color: #fff; border: none; border-radius: 12px; padding: 11px 20px; font-size: 15px; font-weight: 600; cursor: pointer; }
+  #exportBtn:hover { background: #333; }
+  .addIncomeBtn { background: #e6f9dc; border: none; border-radius: 10px; padding: 8px 14px; font-size: 13px; cursor: pointer; font-weight: 600; color: #2f5c17; }
+
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin-bottom: 18px; }
+  .card { border-radius: 16px; padding: 14px 16px; position: relative; }
+  .card .label { font-size: 12.5px; opacity: 0.75; margin: 0 0 6px; font-weight: 600; }
+  .card .value { font-size: 26px; font-weight: 800; margin: 0; line-height: 1.1; }
+  .card .sub2 { font-size: 12px; opacity: 0.7; margin: 4px 0 0; }
+  .card.income { background: #c8f0a0; }
+  .card.otro { background: #e1f5ee; }
+  .card.gastos { background: #f3f0fb; }
+  .card.diario { background: #ffd9a8; }
+  .card.semanal { background: #b9c8f7; }
+  .card.estado-ok { background: #c8f0a0; }
+  .card.estado-bad { background: #f7c1c1; }
+  .card.duracion { background: #fbeaf0; }
+  .card .rm { position: absolute; top: 8px; right: 10px; background: none; border: none; cursor: pointer; font-size: 13px; color: #444; }
+
+  h2.section { font-size: 16px; margin: 0 0 10px; color: #1a1a1a; }
+
+  .lists { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-bottom: 20px; }
+  .list-card { background: #fafafa; border-radius: 16px; padding: 14px 16px; }
+  .item-row { display: flex; align-items: center; gap: 8px; background: #fff; border-radius: 10px; padding: 7px 10px; margin-bottom: 8px; flex-wrap: wrap; border: 1px solid #efefef; }
+  .item-row input[type=text] { width: 120px; }
+  .item-row input[type=number].day { width: 56px; }
+  .item-row input[type=number].amt { width: 80px; }
+  .item-row input { border: 1px solid #e5e5e5; border-radius: 7px; padding: 6px 8px; font-size: 14px; }
+  .item-row .lbl { font-size: 12px; color: #888; }
+  .item-row .ess { display: flex; align-items: center; gap: 4px; font-size: 12px; color: #666; }
+  .item-row button.rmv { margin-left: auto; background: none; border: none; color: #c94f4f; font-size: 13px; cursor: pointer; white-space: nowrap; }
+  .addBtn { background: #eee; border: none; border-radius: 10px; padding: 8px 14px; font-size: 13px; cursor: pointer; font-weight: 600; }
+  .addBtn:hover { background: #e2e2e2; }
+
+  .banner { border-radius: 14px; padding: 14px 18px; margin-bottom: 18px; font-size: 15px; font-weight: 600; }
+  .banner.ok { background: #dff5cf; color: #2f5c17; }
+  .banner.bad { background: #fbdada; color: #7a1f1f; }
+
+  svg#chart { width: 100%; height: auto; }
+  .legend { display: flex; gap: 20px; font-size: 13px; color: #777; margin: 10px 0 4px; flex-wrap: wrap; }
+  .legend span.sw { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: -2px; margin-right: 5px; }
+  .legend span.ln { display: inline-block; width: 14px; height: 2px; background: #0F6E56; vertical-align: middle; margin-right: 5px; }
+
+  @media (max-width: 640px) {
+    body { font-size: 15px; }
+    h1 { font-size: 24px; }
+    .card .value { font-size: 22px; }
+  }
+  @media print {
+    body { background: #fff; padding: 0; }
+    #sheet { border-radius: 0; }
+    #exportBtn, .addBtn, .addIncomeBtn, .item-row .rmv, .card .rm { display: none !important; }
+  }
+</style>
+</head>
+<body>
+<div id="sheet">
+  <div class="top">
+    <div>
+      <h1>Tu plan del mes</h1>
+      <p class="sub">Cuánto puedes gastar por día y por semana, y cuánto necesitas para llegar a fin de mes</p>
+    </div>
+    <div class="income-box">
+      <label for="income-principal">Ingreso principal (S/)</label>
+      <input type="number" id="income-principal" value="2600" min="0" step="10" oninput="recalc()">
+      <button class="addIncomeBtn" onclick="addOtroIngreso()">+ Otro ingreso</button>
+      <button id="exportBtn" onclick="exportPDF()">Exportar a PDF</button>
+    </div>
+  </div>
+
+  <div class="cards" id="cards"></div>
+  <p class="banner" id="banner"></p>
+
+  <div class="lists">
+    <div class="list-card">
+      <h2 class="section">Pagos fijos con fecha</h2>
+      <div id="list-fijos"></div>
+      <button class="addBtn" onclick="addCatItem('fijos')">+ Agregar pago fijo</button>
+    </div>
+    <div class="list-card">
+      <h2 class="section">Compras o gastos del mes</h2>
+      <div id="list-compras"></div>
+      <button class="addBtn" onclick="addCatItem('compras')">+ Agregar compra o gasto</button>
+    </div>
+    <div class="list-card">
+      <h2 class="section">Gastos semanales</h2>
+      <div id="list-semanales"></div>
+      <button class="addBtn" onclick="addCatItem('semanales')">+ Agregar gasto semanal</button>
+    </div>
+    <div class="list-card">
+      <h2 class="section">Gastos diarios</h2>
+      <div id="list-diarios"></div>
+      <button class="addBtn" onclick="addCatItem('diarios')">+ Agregar gasto diario</button>
+    </div>
+    <div class="list-card">
+      <h2 class="section">Deudas y préstamos pendientes</h2>
+      <div id="list-deudas"></div>
+      <button class="addBtn" onclick="addCatItem('deudas')">+ Agregar deuda o préstamo</button>
+    </div>
+  </div>
+
+  <h2 class="section">Semana a semana y día a día (1 al 30)</h2>
+  <svg id="chart" viewBox="0 0 1200 300"></svg>
+  <div class="legend">
+    <span><span class="sw" style="background:#ffd9a8"></span>Presupuesto repartido parejo por semana</span>
+    <span><span class="ln"></span>Tu saldo real día a día</span>
+    <span><span class="sw" style="background:#e26060;border-radius:50%;width:10px;height:10px;display:inline-block"></span>Día con pago o deuda</span>
+  </div>
+</div>
+
+<script>
+let otrosIngresos = [];
+
+const CATS = {
+  fijos:     { title:'fijos',     hasDay:true,  defEss:true,  items:[{name:'Alquiler', day:5,  amount:0, essential:true},{name:'Colegio', day:10, amount:0, essential:true}] },
+  compras:   { title:'compras',   hasDay:true,  defEss:false, items:[] },
+  semanales: { title:'semanales', hasDay:false, defEss:false, items:[] },
+  diarios:   { title:'diarios',   hasDay:false, defEss:false, items:[] },
+  deudas:    { title:'deudas',    hasDay:true,  defEss:true,  items:[] }
+};
+
+function money(n){ return 'S/ ' + Math.round(n).toLocaleString('es-PE'); }
+
+function renderOtros(){
+  // otros ingresos shown as cards; nothing else to render separately
+}
+
+function addOtroIngreso(){
+  otrosIngresos.push({name:'', amount:0});
+  recalc();
+}
+function removeOtro(i){ otrosIngresos.splice(i,1); recalc(); }
+function updateOtro(i, field, val){
+  if(field==='amount') val = Math.max(0, parseFloat(val)||0);
+  otrosIngresos[i][field] = val;
+  recalc();
+}
+
+function addCatItem(key){
+  const c = CATS[key];
+  const item = { name:'', amount:0, essential:c.defEss };
+  if(c.hasDay) item.day = 1;
+  c.items.push(item);
+  renderCat(key);
+  recalc();
+}
+function removeCatItem(key, i){ CATS[key].items.splice(i,1); renderCat(key); recalc(); }
+function updateCatItem(key, i, field, val){
+  if(field==='day') val = Math.min(30, Math.max(1, parseInt(val)||1));
+  if(field==='amount') val = Math.max(0, parseFloat(val)||0);
+  CATS[key].items[i][field] = val;
+  recalc();
+}
+
+function renderCat(key){
+  const c = CATS[key];
+  const wrap = document.getElementById('list-'+key);
+  wrap.innerHTML = '';
+  c.items.forEach((it,i)=>{
+    const row = document.createElement('div');
+    row.className = 'item-row';
+    let html = '<input type="text" placeholder="Nombre" value="'+String(it.name).replace(/"/g,'')+'" oninput="updateCatItem(\''+key+'\','+i+',\'name\',this.value)">';
+    if(c.hasDay){
+      html += '<span class="lbl">Día</span><input type="number" class="day" min="1" max="30" value="'+it.day+'" oninput="updateCatItem(\''+key+'\','+i+',\'day\',this.value)">';
+    }
+    html += '<span class="lbl">S/</span><input type="number" class="amt" min="0" value="'+it.amount+'" oninput="updateCatItem(\''+key+'\','+i+',\'amount\',this.value)">';
+    html += '<label class="ess"><input type="checkbox" '+(it.essential?'checked':'')+' onchange="updateCatItem(\''+key+'\','+i+',\'essential\',this.checked)">Necesario</label>';
+    html += '<button class="rmv" onclick="removeCatItem(\''+key+'\','+i+')">Eliminar</button>';
+    row.innerHTML = html;
+    wrap.appendChild(row);
+  });
+}
+
+function sumAmount(key, essOnly){
+  return CATS[key].items.reduce((s,it)=> s + ((!essOnly || it.essential) ? it.amount : 0), 0);
+}
+
+function buildCards(totalIncomeAll, otrosTotal, totalGastos, dailyAvail, weeklyAvail, essDiff, runOut, balEnd){
+  const wrap = document.getElementById('cards');
+  wrap.innerHTML = '';
+  wrap.innerHTML += '<div class="card income"><p class="label">Ingreso total</p><p class="value">'+money(totalIncomeAll)+'</p><p class="sub2">Principal + otros ingresos</p></div>';
+  otrosIngresos.forEach((o,i)=>{
+    wrap.innerHTML += '<div class="card otro"><button class="rm" onclick="removeOtro('+i+')">✕</button><p class="label">Otro ingreso</p><p class="value">'+money(o.amount)+'</p>' +
+      '<p class="sub2"><input type="text" placeholder="Nombre" value="'+String(o.name).replace(/"/g,'')+'" style="width:90px;border:1px solid #cfe;border-radius:6px;padding:2px 5px;font-size:12px" oninput="updateOtro('+i+',\'name\',this.value)">' +
+      ' <input type="number" min="0" value="'+o.amount+'" style="width:70px;border:1px solid #cfe;border-radius:6px;padding:2px 5px;font-size:12px" oninput="updateOtro('+i+',\'amount\',this.value)"></p></div>';
+  });
+  wrap.innerHTML += '<div class="card gastos"><p class="label">Gastos totales del mes</p><p class="value">'+money(totalGastos)+'</p></div>';
+  wrap.innerHTML += '<div class="card diario"><p class="label">Disponible por día</p><p class="value">'+money(dailyAvail)+'</p></div>';
+  wrap.innerHTML += '<div class="card semanal"><p class="label">Disponible por semana</p><p class="value">'+money(weeklyAvail)+'</p></div>';
+  const estadoClass = essDiff < 0 ? 'estado-bad' : 'estado-ok';
+  const estadoTxt = essDiff < 0 ? 'Necesitas prestar' : 'Te sobra tras lo necesario';
+  wrap.innerHTML += '<div class="card '+estadoClass+'"><p class="label">'+estadoTxt+'</p><p class="value">'+money(Math.abs(essDiff))+'</p></div>';
+  const durTxt = runOut ? ('Alcanza hasta el día '+runOut) : 'Alcanza todo el mes';
+  const durSub = runOut ? 'Después de ese día no queda dinero' : ('Con '+money(balEnd)+' de sobra');
+  wrap.innerHTML += '<div class="card duracion"><p class="label">Duración del dinero</p><p class="value">'+durTxt+'</p><p class="sub2">'+durSub+'</p></div>';
+}
+
+function drawChart(totalIncomeAll, dailyAvail, balances, oneTimeDays){
+  const svg = document.getElementById('chart');
+  const x0=60, x1=1160, y0=250, y1=30;
+  const maxVal = Math.max(totalIncomeAll, 1);
+  const xFor = d => x0 + (x1-x0)*(d/30);
+  const yFor = v => y0 - (y0-y1) * (Math.max(0, Math.min(maxVal, v)) / maxVal);
+
+  let parts = [];
+  const ranges = [[1,7,'Semana 1'],[8,14,'Semana 2'],[15,21,'Semana 3'],[22,30,'Semana 4']];
+  ranges.forEach(r=>{
+    const days = r[1]-r[0]+1;
+    const barVal = Math.max(0, dailyAvail) * days;
+    const xs = xFor(r[0]-1), xe = xFor(r[1]);
+    const yb = yFor(barVal);
+    parts.push('<rect x="'+xs+'" y="'+yb+'" width="'+(xe-xs-4)+'" height="'+(y0-yb)+'" fill="#ffd9a8" rx="6"/>');
+    parts.push('<text x="'+((xs+xe)/2)+'" y="'+(yb-8)+'" font-size="13" text-anchor="middle" fill="#8a5a1a" font-weight="700">'+money(barVal)+'</text>');
+    parts.push('<text x="'+((xs+xe)/2)+'" y="'+(y0+22)+'" font-size="12" text-anchor="middle" fill="#999">'+r[2]+'</text>');
+  });
+
+  parts.push('<line x1="'+x0+'" y1="'+y0+'" x2="'+x1+'" y2="'+y0+'" stroke="#ddd" stroke-width="1"/>');
+  parts.push('<line x1="'+x0+'" y1="'+y1+'" x2="'+x0+'" y2="'+y0+'" stroke="#ddd" stroke-width="1"/>');
+  parts.push('<text x="20" y="'+(y1+6)+'" font-size="12" fill="#888">'+money(totalIncomeAll)+'</text>');
+  parts.push('<text x="30" y="'+(y0+4)+'" font-size="12" fill="#888">0</text>');
+
+  let linePath = 'M '+xFor(0)+' '+yFor(balances[0]);
+  for(let d=1; d<=30; d++){ linePath += ' L '+xFor(d)+' '+yFor(balances[d]); }
+  parts.push('<path d="'+linePath+'" fill="none" stroke="#0F6E56" stroke-width="3"/>');
+
+  oneTimeDays.forEach(o=>{
+    const cx = xFor(o.day), cy = yFor(balances[o.day]);
+    parts.push('<circle cx="'+cx+'" cy="'+cy+'" r="5" fill="#e26060"><title>'+o.name+': '+money(o.amount)+'</title></circle>');
+  });
+
+  [1,5,10,15,20,25,30].forEach(d=>{
+    parts.push('<text x="'+xFor(d)+'" y="'+(y0+40)+'" font-size="12" text-anchor="middle" fill="#aaa">Día '+d+'</text>');
+  });
+
+  svg.innerHTML = parts.join('');
+}
+
+function recalc(){
+  const principal = Math.max(0, parseFloat(document.getElementById('income-principal').value)||0);
+  const otrosTotal = otrosIngresos.reduce((s,o)=>s+o.amount,0);
+  const totalIncomeAll = principal + otrosTotal;
+
+  const dailyDiarios = sumAmount('diarios');
+  const dailyDiariosEss = sumAmount('diarios', true);
+  const weeklySum = sumAmount('semanales');
+  const weeklySumEss = sumAmount('semanales', true);
+  const dailyRecurring = dailyDiarios + weeklySum/7;
+  const dailyRecurringEss = dailyDiariosEss + weeklySumEss/7;
+
+  const oneTimeAll = sumAmount('fijos') + sumAmount('compras') + sumAmount('deudas');
+  const oneTimeEss = sumAmount('fijos', true) + sumAmount('compras', true) + sumAmount('deudas', true);
+
+  const totalGastos = oneTimeAll + dailyRecurring*30;
+  const totalEsencial = oneTimeEss + dailyRecurringEss*30;
+
+  const dailyAvail = (totalIncomeAll - totalGastos)/30;
+  const weeklyAvail = dailyAvail*7;
+  const essDiff = totalIncomeAll - totalEsencial;
+
+  let bal = totalIncomeAll;
+  const balances = [bal];
+  let runOut = null;
+  const oneTimeDays = [];
+  ['fijos','compras','deudas'].forEach(key=>{
+    CATS[key].items.forEach(it=>{ if(it.amount>0) oneTimeDays.push({day: it.day, name: it.name || key, amount: it.amount}); });
+  });
+  for(let d=1; d<=30; d++){
+    bal -= dailyRecurring;
+    oneTimeDays.forEach(o=>{ if(o.day===d) bal -= o.amount; });
+    balances.push(bal);
+    if(runOut===null && bal<=0) runOut = d;
+  }
+
+  buildCards(totalIncomeAll, otrosTotal, totalGastos, dailyAvail, weeklyAvail, essDiff, runOut, balances[30]);
+
+  const banner = document.getElementById('banner');
+  if(essDiff < 0){
+    banner.className = 'banner bad';
+    banner.textContent = 'Con solo lo necesario ya te falta ' + money(Math.abs(essDiff)) + ' este mes. Esa es la cantidad que necesitarías prestar o conseguir de algún otro lado para cubrir lo esencial.';
+  } else {
+    banner.className = 'banner ok';
+    banner.textContent = 'Cubriendo todo lo necesario, te quedan ' + money(essDiff) + ' libres en el mes para lo demás.';
+  }
+
+  drawChart(totalIncomeAll, dailyAvail, balances, oneTimeDays);
+}
+
+function exportPDF(){
+  const el = document.getElementById('sheet');
+  html2pdf().set({
+    margin: 8,
+    filename: 'plan-del-mes.pdf',
+    html2canvas: { scale: 2 },
+    jsPDF: { unit: 'mm', format: 'a3', orientation: 'landscape' }
+  }).from(el).save();
+}
+
+Object.keys(CATS).forEach(renderCat);
+recalc();
+</script>
+</body>
+</html>
